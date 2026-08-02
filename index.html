@@ -676,7 +676,6 @@
           <p class="hint">Toca una rosa para contarla 🌹</p>
         </div>
 
-        <p class="footer-note reveal">Pequeña pista: quizá nunca termines de contarlas.</p>
       </div>
     </section>
   </main>
@@ -685,16 +684,16 @@
     <button class="rose" type="button" aria-label="Recoger una rosa">
       <svg viewBox="0 0 100 100" aria-hidden="true">
         <g class="rose__face" transform="translate(50 48)">
-          <circle r="34" fill="#ff8eaa"/>
-          <circle cx="-18" cy="-10" r="20" fill="#ff6f91"/>
-          <circle cx="19" cy="-10" r="20" fill="#ff6f91"/>
-          <circle cx="-12" cy="17" r="19" fill="#f65d83"/>
-          <circle cx="13" cy="16" r="19" fill="#f65d83"/>
-          <circle r="15" fill="#d9436c"/>
+          <circle r="34" fill="var(--petal-light)"/>
+          <circle cx="-18" cy="-10" r="20" fill="var(--petal-main)"/>
+          <circle cx="19" cy="-10" r="20" fill="var(--petal-main)"/>
+          <circle cx="-12" cy="17" r="19" fill="var(--petal-deep)"/>
+          <circle cx="13" cy="16" r="19" fill="var(--petal-deep)"/>
+          <circle r="15" fill="var(--petal-center)"/>
           <ellipse cx="-8" cy="-8" rx="5" ry="7" fill="#fff" opacity=".68"/>
-          <circle cx="-6" cy="5" r="2.6" fill="#6b2340"/>
-          <circle cx="6" cy="5" r="2.6" fill="#6b2340"/>
-          <path d="M-6 13c4 4 8 4 12 0" fill="none" stroke="#6b2340" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="-6" cy="5" r="2.6" fill="var(--face-color)"/>
+          <circle cx="6" cy="5" r="2.6" fill="var(--face-color)"/>
+          <path d="M-6 13c4 4 8 4 12 0" fill="none" stroke="var(--face-color)" stroke-width="3.5" stroke-linecap="round"/>
         </g>
       </svg>
     </button>
@@ -709,67 +708,102 @@
 
     let totalRoses = 0;
 
-    // Las posiciones forman una malla compacta, no filas separadas.
-    // El gran tamaño y la poca distancia entre centros hacen que los pétalos
-    // se entrelacen visualmente como una sola masa de flores.
+    // Veinte posiciones únicas y escalonadas forman un ramo tejido.
+    // Ninguna rosa está directamente apilada sobre otra.
     const positions = [
-      { x: 29, y: 29, size: 96, tilt: -12 },
-      { x: 43, y: 23, size: 104, tilt: 7 },
-      { x: 57, y: 24, size: 101, tilt: -5 },
-      { x: 70, y: 31, size: 94, tilt: 11 },
+      // Fila superior
+      { x: 34, y: 25, size: 88, tilt: -11, layer: 12 },
+      { x: 45, y: 21, size: 94, tilt: -3,  layer: 14 },
+      { x: 56, y: 21, size: 94, tilt: 4,   layer: 13 },
+      { x: 67, y: 25, size: 88, tilt: 11,  layer: 12 },
 
-      { x: 23, y: 42, size: 91, tilt: 8 },
-      { x: 37, y: 38, size: 106, tilt: -7 },
-      { x: 51, y: 37, size: 110, tilt: 5 },
-      { x: 65, y: 40, size: 104, tilt: -10 },
-      { x: 77, y: 44, size: 90, tilt: 9 },
+      // Segunda fila, desplazada para entretejerse con la superior
+      { x: 25, y: 35, size: 86, tilt: -12, layer: 15 },
+      { x: 38, y: 33, size: 94, tilt: 6,   layer: 17 },
+      { x: 50, y: 31, size: 98, tilt: -2,  layer: 16 },
+      { x: 62, y: 33, size: 94, tilt: -6,  layer: 17 },
+      { x: 75, y: 35, size: 86, tilt: 12,  layer: 15 },
 
-      { x: 31, y: 53, size: 94, tilt: -5 },
-      { x: 45, y: 50, size: 108, tilt: 8 },
-      { x: 59, y: 52, size: 103, tilt: -8 },
-      { x: 70, y: 57, size: 91, tilt: 5 }
+      // Tercera fila, alternada
+      { x: 19, y: 47, size: 82, tilt: -10, layer: 18 },
+      { x: 31, y: 45, size: 91, tilt: 5,   layer: 20 },
+      { x: 43, y: 44, size: 96, tilt: -5,  layer: 19 },
+      { x: 56, y: 44, size: 96, tilt: 5,   layer: 20 },
+      { x: 69, y: 45, size: 91, tilt: -5,  layer: 19 },
+      { x: 81, y: 47, size: 82, tilt: 10,  layer: 18 },
+
+      // Fila inferior, cerrando el ramo
+      { x: 29, y: 57, size: 84, tilt: -8,  layer: 22 },
+      { x: 40, y: 56, size: 91, tilt: 5,   layer: 24 },
+      { x: 50, y: 55, size: 95, tilt: -2,  layer: 23 },
+      { x: 61, y: 56, size: 91, tilt: -5,  layer: 24 },
+      { x: 72, y: 57, size: 84, tilt: 8,   layer: 22 }
     ];
 
-    const stackDepth = 11;
-    const roseStacks = positions.map(() => []);
+    // 8 de 20 rosas son rojas: exactamente el 40%.
+    const roseColors = [
+      "red", "pink", "red", "lavender",
+      "yellow", "red", "white", "pink", "red",
+      "lavender", "pink", "red", "yellow", "white", "red",
+      "pink", "red", "yellow", "white", "red"
+    ];
+
+    const palettes = {
+      red:      ["#ff8a92", "#f4515f", "#df2638", "#c8182b", "#8f1725"],
+      pink:     ["#ffc1d4", "#ff91b6", "#f56b9c", "#df477f", "#8f3159"],
+      white:    ["#fffdf8", "#fff4df", "#f5e4ca", "#e6cda9", "#7b624d"],
+      yellow:   ["#ffeaa0", "#ffd15c", "#f6b934", "#e39a18", "#77501c"],
+      lavender: ["#e1c9ff", "#c99cf5", "#ad73df", "#8c4fbd", "#57336f"]
+    };
+
+    const rosesBySlot = new Array(positions.length);
+    const pendingRoses = [];
+    let replacementColorIndex = 0;
 
     function randomBetween(min, max) {
       return Math.random() * (max - min) + min;
     }
 
-    function placeRose(rose, basePosition, depth) {
-      // Las capas inferiores apenas se desplazan: permanecen escondidas
-      // detrás de la flor visible y se descubren de forma natural al retirarla.
-      const depthOffset = depth * 0.055;
-      const jitterX = randomBetween(-1.35, 1.35) + depthOffset;
-      const jitterY = randomBetween(-1.1, 1.1) + depthOffset * 0.35;
-      const sizeJitter = randomBetween(-2.5, 2.5) - depth * 0.045;
-      const tiltJitter = randomBetween(-3.5, 3.5);
+    function placeRose(rose, basePosition, isReplacement = false) {
+      const jitterX = randomBetween(-0.55, 0.55);
+      const jitterY = randomBetween(-0.45, 0.45);
+      const sizeJitter = randomBetween(-1.4, 1.4);
+      const tiltJitter = randomBetween(-2.2, 2.2);
 
       rose.style.setProperty("--x", `${basePosition.x + jitterX}%`);
       rose.style.setProperty("--y", `${basePosition.y + jitterY}%`);
       rose.style.setProperty("--size", `${basePosition.size + sizeJitter}px`);
       rose.style.setProperty("--tilt", `${basePosition.tilt + tiltJitter}deg`);
-      rose.style.setProperty("--layer", `${40 - depth}`);
+
+      // Las flores iniciales se entretejen con capas alternadas.
+      // Cada reemplazo nace detrás de todo el ramo, pero por encima del papel.
+      rose.style.setProperty("--layer", `${isReplacement ? 4 : basePosition.layer}`);
     }
 
-    function makeRose(position, slot, depth) {
-      const rose = roseTemplate.content.firstElementChild.cloneNode(true);
-      rose.dataset.slot = slot;
-      rose.dataset.depth = depth;
-      placeRose(rose, position, depth);
-      rose.addEventListener("click", pickRose);
-      roseStacks[slot].push(rose);
-      bouquet.appendChild(rose);
+    function applyRoseColor(rose, colorName) {
+      const [light, main, deep, center, face] = palettes[colorName];
+      rose.style.setProperty("--petal-light", light);
+      rose.style.setProperty("--petal-main", main);
+      rose.style.setProperty("--petal-deep", deep);
+      rose.style.setProperty("--petal-center", center);
+      rose.style.setProperty("--face-color", face);
+      rose.dataset.color = colorName;
     }
 
-    function refillStack(slot) {
-      const stack = roseStacks[slot];
+    function makeRose(slot, { isReplacement = false, colorOverride = null } = {}) {
       const position = positions[slot];
+      const rose = roseTemplate.content.firstElementChild.cloneNode(true);
+      const color = colorOverride || (isReplacement
+        ? roseColors[replacementColorIndex++ % roseColors.length]
+        : roseColors[slot]);
 
-      while (stack.length < stackDepth) {
-        makeRose(position, slot, stack.length);
-      }
+      rose.dataset.slot = slot;
+      applyRoseColor(rose, color);
+      placeRose(rose, position, isReplacement);
+      rose.addEventListener("click", pickRose);
+      rosesBySlot[slot] = rose;
+      bouquet.appendChild(rose);
+      return rose;
     }
 
     function showPlusOne(event) {
@@ -792,33 +826,39 @@
       if (rose.classList.contains("is-picked")) return;
 
       const slot = Number(rose.dataset.slot);
-      const stack = roseStacks[slot];
-
-      if (stack[0] !== rose) return;
+      if (rosesBySlot[slot] !== rose) return;
 
       totalRoses += 1;
       roseCount.textContent = totalRoses.toLocaleString("es-CO");
       rose.classList.add("is-picked");
       showPlusOne(event);
 
+      // La rosa retirada espera dos clics completos antes de regresar.
+      // En el tercer clic se libera la que se quitó dos turnos atrás.
+      pendingRoses.push({ slot, color: rose.dataset.color });
+      const roseReadyToReturn = pendingRoses.length > 2
+        ? pendingRoses.shift()
+        : null;
+
       if (navigator.vibrate) {
         navigator.vibrate(20);
       }
 
       window.setTimeout(() => {
-        const removed = stack.shift();
-        removed.remove();
+        rose.remove();
+        rosesBySlot[slot] = null;
 
-        stack.forEach((stackedRose, index) => {
-          stackedRose.dataset.depth = index;
-          stackedRose.style.setProperty("--layer", `${40 - index}`);
-        });
-
-        makeRose(positions[slot], slot, stackDepth - 1);
+        if (roseReadyToReturn) {
+          // Regresa en su posición original, por detrás de las flores vecinas.
+          makeRose(roseReadyToReturn.slot, {
+            isReplacement: true,
+            colorOverride: roseReadyToReturn.color
+          });
+        }
       }, 520);
     }
 
-    positions.forEach((position, slot) => refillStack(slot));
+    positions.forEach((_, slot) => makeRose(slot));
 
     const revealObserver = new IntersectionObserver(
       entries => {
